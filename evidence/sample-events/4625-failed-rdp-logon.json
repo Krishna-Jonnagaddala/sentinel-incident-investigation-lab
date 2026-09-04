@@ -1,0 +1,19 @@
+{
+  "TimeGenerated": "2024-04-17T02:31:52.4471120Z",
+  "Computer": "FIN-WKS-04",
+  "EventID": 4625,
+  "Activity": "4625 - An account failed to log on.",
+  "Channel": "Security",
+  "AccountType": "User",
+  "TargetUserName": "svc_backup",
+  "TargetDomainName": "CORP",
+  "LogonType": 10,
+  "LogonProcessName": "User32",
+  "AuthenticationPackageName": "Negotiate",
+  "Status": "0xC000006D",
+  "SubStatus": "0xC000006A",
+  "FailureReason": "%%2313 (Unknown user name or bad password)",
+  "IpAddress": "45.155.205.233",
+  "IpPort": "0",
+  "WorkstationName": "FIN-WKS-04"
+}

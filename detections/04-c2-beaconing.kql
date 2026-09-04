@@ -1,0 +1,41 @@
+// Detection: Possible C2 beaconing (regular outbound intervals from one process)
+// Tactic/Technique: Command and Control / T1071.001
+// Schedule: run every 1h, lookback 4h
+// Beacons phone home on a schedule. Benign traffic is bursty and irregular; a beacon
+// tends toward a low-variance interval to the same destination. This looks for a
+// destination that a single host hit many times with a tight, consistent gap between
+// connections.
+//
+// stdev of the inter-connection gap is the discriminator: a small stdev relative to the
+// average gap means "regular", which is the beacon signature. Thresholds here are tuned
+// for the lab; widen the connection count and loosen stdev for a noisier real network.
+
+let minConnections = 10;
+Event
+| where Source == "Microsoft-Windows-Sysmon" and EventID == 3
+| parse EventData with * '<Data Name="Image">' Image '</Data>' *
+| parse EventData with * '<Data Name="DestinationIp">' DestinationIp '</Data>' *
+| parse EventData with * '<Data Name="DestinationPort">' DestinationPort '</Data>' *
+| where DestinationIp !startswith "10." and DestinationIp !startswith "192.168."
+        and DestinationIp !startswith "172.16." and DestinationIp != "127.0.0.1"
+| order by Computer, DestinationIp, TimeGenerated asc
+| serialize
+| extend PrevTime = prev(TimeGenerated), PrevDest = prev(DestinationIp), PrevHost = prev(Computer)
+| where DestinationIp == PrevDest and Computer == PrevHost
+| extend GapSeconds = datetime_diff('second', TimeGenerated, PrevTime)
+| summarize
+    Connections = count(),
+    AvgGapSeconds = avg(GapSeconds),
+    StdevGapSeconds = stdev(GapSeconds),
+    FirstSeen = min(TimeGenerated),
+    LastSeen = max(TimeGenerated),
+    Ports = make_set(DestinationPort, 10),
+    Processes = make_set(Image, 10)
+    by Computer, DestinationIp
+| where Connections >= minConnections
+| extend Regularity = round(StdevGapSeconds / AvgGapSeconds, 2)   // lower = more beacon-like
+| where Regularity < 0.25
+| project FirstSeen, LastSeen, Computer, DestinationIp, Connections,
+          AvgGapSeconds = round(AvgGapSeconds, 1), StdevGapSeconds = round(StdevGapSeconds, 1),
+          Regularity, Ports, Processes
+| order by Regularity asc

@@ -1,0 +1,24 @@
+<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+  <System>
+    <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385f-c22a-43e0-bf4c-06f5698ffbd9}" />
+    <EventID>3</EventID>
+    <Computer>FIN-WKS-04</Computer>
+    <TimeCreated SystemTime="2024-04-17T02:55:23.114Z" />
+  </System>
+  <EventData>
+    <Data Name="RuleName">-</Data>
+    <Data Name="UtcTime">2024-04-17 02:55:23.114</Data>
+    <Data Name="ProcessId">7412</Data>
+    <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+    <Data Name="User">CORP\a.patel</Data>
+    <Data Name="Protocol">tcp</Data>
+    <Data Name="Initiated">true</Data>
+    <Data Name="SourceIp">10.10.20.45</Data>
+    <Data Name="SourceHostname">FIN-WKS-04.corp.lab</Data>
+    <Data Name="SourcePort">51993</Data>
+    <Data Name="DestinationIp">185.220.101.47</Data>
+    <Data Name="DestinationHostname">cdn-telemetry.net</Data>
+    <Data Name="DestinationPort">443</Data>
+    <Data Name="DestinationPortName">https</Data>
+  </EventData>
+</Event>

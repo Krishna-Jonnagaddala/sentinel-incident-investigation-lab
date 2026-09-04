@@ -1,0 +1,36 @@
+// Detection: Brute force followed by successful interactive logon
+// Tactic/Technique: Credential Access + Initial Access / T1110.001 + T1078
+// Schedule: run every 5m, lookback 1h
+// This is the rule that raised INC-2024-0417.
+//
+// The single failed-logon storm is noisy and usually benign-ish (internet background
+// scanning). What actually matters is when that storm is followed by a SUCCESS from the
+// same source IP against the same host: that's the guess landing. This rule joins the
+// two and only alerts on the correlation.
+
+let lookback = 1h;
+let failThreshold = 15;
+// Step 1: source IPs that failed a lot of RDP logons against a host.
+let bruteForce =
+    SecurityEvent
+    | where TimeGenerated > ago(lookback)
+    | where EventID == 4625 and LogonType == 10
+    | where isnotempty(IpAddress) and IpAddress != "-"
+    | summarize FailedAttempts = count(), FailStart = min(TimeGenerated), FailEnd = max(TimeGenerated)
+        by IpAddress, Computer
+    | where FailedAttempts >= failThreshold;
+// Step 2: successful RDP logons.
+let success =
+    SecurityEvent
+    | where TimeGenerated > ago(lookback)
+    | where EventID == 4624 and LogonType == 10
+    | where isnotempty(IpAddress) and IpAddress != "-"
+    | project SuccessTime = TimeGenerated, IpAddress, Computer, TargetUserName, TargetDomainName, LogonProcessName;
+// Step 3: keep successes from the same IP+host, occurring after the failures started.
+bruteForce
+| join kind=inner success on IpAddress, Computer
+| where SuccessTime >= FailStart
+| extend SecondsFromFirstFail = datetime_diff('second', SuccessTime, FailStart)
+| project SuccessTime, IpAddress, Computer, CompromisedAccount = strcat(TargetDomainName, "\\", TargetUserName),
+          FailedAttempts, FailStart, FailEnd, SecondsFromFirstFail, LogonProcessName
+| order by SuccessTime asc

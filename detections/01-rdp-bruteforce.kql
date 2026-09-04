@@ -1,0 +1,26 @@
+// Detection: RDP brute force (repeated failed RemoteInteractive logons)
+// Tactic/Technique: Credential Access / T1110.001
+// Schedule: run every 15m, lookback 1h
+// Fires when a single source IP racks up many failed RDP logons against a host.
+//
+// LogonType 10 = RemoteInteractive (RDP). SubStatus 0xC000006A = bad password
+// (the account exists), which is the interesting case: someone is guessing a real
+// account, not just spraying random usernames.
+
+let threshold = 15;
+SecurityEvent
+| where EventID == 4625
+| where LogonType == 10
+| where isnotempty(IpAddress) and IpAddress != "-"
+| summarize
+    FailedAttempts = count(),
+    TargetedAccounts = make_set(TargetUserName, 25),
+    DistinctAccounts = dcount(TargetUserName),
+    FirstSeen = min(TimeGenerated),
+    LastSeen = max(TimeGenerated)
+    by IpAddress, Computer
+| where FailedAttempts >= threshold
+| extend DurationMin = datetime_diff('minute', LastSeen, FirstSeen)
+| project FirstSeen, LastSeen, DurationMin, IpAddress, Computer,
+          FailedAttempts, DistinctAccounts, TargetedAccounts
+| order by FailedAttempts desc

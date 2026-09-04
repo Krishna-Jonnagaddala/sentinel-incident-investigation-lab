@@ -1,0 +1,18 @@
+{
+  "TimeGenerated": "2024-04-17T02:49:11.9082376Z",
+  "Computer": "FIN-WKS-04",
+  "EventID": 4624,
+  "Activity": "4624 - An account was successfully logged on.",
+  "Channel": "Security",
+  "AccountType": "User",
+  "TargetUserName": "a.patel",
+  "TargetDomainName": "CORP",
+  "LogonType": 10,
+  "LogonProcessName": "User32",
+  "AuthenticationPackageName": "Negotiate",
+  "ElevatedToken": "%%1842",
+  "IpAddress": "45.155.205.233",
+  "IpPort": "0",
+  "WorkstationName": "FIN-WKS-04",
+  "LogonId": "0x8F3A2C1"
+}

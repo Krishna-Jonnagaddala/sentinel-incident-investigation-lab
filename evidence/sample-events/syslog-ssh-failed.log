@@ -1,0 +1,8 @@
+Apr 17 03:05:41 WEB-SRV-02 sshd[20431]: Connection from 10.10.20.45 port 51810 on 10.10.20.60 port 22
+Apr 17 03:05:44 WEB-SRV-02 sshd[20455]: Failed password for a.patel from 10.10.20.45 port 51824 ssh2
+Apr 17 03:05:47 WEB-SRV-02 sshd[20455]: Failed password for a.patel from 10.10.20.45 port 51824 ssh2
+Apr 17 03:05:51 WEB-SRV-02 sshd[20455]: Failed password for a.patel from 10.10.20.45 port 51824 ssh2
+Apr 17 03:05:53 WEB-SRV-02 sshd[20455]: Connection closed by authenticating user a.patel 10.10.20.45 port 51824 [preauth]
+Apr 17 03:06:02 WEB-SRV-02 sshd[20461]: Failed password for invalid user root from 10.10.20.45 port 51840 ssh2
+Apr 17 03:06:06 WEB-SRV-02 sshd[20461]: Failed password for invalid user root from 10.10.20.45 port 51840 ssh2
+Apr 17 03:06:09 WEB-SRV-02 sshd[20461]: Connection closed by invalid user root 10.10.20.45 port 51840 [preauth]

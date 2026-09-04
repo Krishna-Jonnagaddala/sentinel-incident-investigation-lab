@@ -1,0 +1,106 @@
+// ===================================================================================
+// Hunting / investigation queries used to work INC-2024-0417.
+// These are the queries I actually ran during triage, in roughly the order I ran them.
+// The detection RULES live in ../detections/; these are the ad-hoc investigation queries.
+// Window for the incident: 2024-04-17 02:00 - 04:00 UTC.
+// ===================================================================================
+
+// -- Q1. Confirm the brute force and the success are the same actor -----------------
+SecurityEvent
+| where TimeGenerated between (datetime(2024-04-17 02:00) .. datetime(2024-04-17 04:00))
+| where Computer == "FIN-WKS-04" and EventID in (4624, 4625) and LogonType == 10
+| summarize Attempts = count(), FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated)
+    by EventID, IpAddress, TargetUserName
+| order by EventID asc, Attempts desc;
+
+// -- Q2. Why did the failures fail? (SubStatus: bad password vs bad user) -----------
+// 0xC000006A = bad password (account exists) ; 0xC0000064 = user does not exist.
+SecurityEvent
+| where TimeGenerated between (datetime(2024-04-17 02:00) .. datetime(2024-04-17 04:00))
+| where Computer == "FIN-WKS-04" and EventID == 4625 and LogonType == 10
+| summarize Attempts = count() by TargetUserName, SubStatus
+| order by Attempts desc;
+
+// -- Q3. a.patel's normal logon pattern (is external RDP at 02:49 in character?) ----
+SecurityEvent
+| where TimeGenerated > ago(30d)
+| where EventID == 4624 and TargetUserName == "a.patel"
+| summarize LogonCount = count() by LogonType, IpAddress, bin(TimeGenerated, 1d)
+| order by TimeGenerated desc;
+
+// -- Q4. Was the credential replayed against other hosts in the window? -------------
+SecurityEvent
+| where TimeGenerated between (datetime(2024-04-17 02:00) .. datetime(2024-04-17 04:00))
+| where EventID in (4624, 4625) and TargetUserName == "a.patel"
+| summarize Attempts = count() by Computer, EventID, IpAddress
+| order by Computer asc;
+
+// -- Q5. Did the session run with elevated privileges? (4672) -----------------------
+SecurityEvent
+| where TimeGenerated between (datetime(2024-04-17 02:49) .. datetime(2024-04-17 03:00))
+| where Computer == "FIN-WKS-04" and EventID == 4672
+| project TimeGenerated, Account, PrivilegeList;
+
+// -- Q6. Process creation after the logon (find the PowerShell) ---------------------
+Event
+| where TimeGenerated between (datetime(2024-04-17 02:49) .. datetime(2024-04-17 04:00))
+| where Computer == "FIN-WKS-04" and Source == "Microsoft-Windows-Sysmon" and EventID == 1
+| parse EventData with * '<Data Name="Image">' Image '</Data>' *
+| parse EventData with * '<Data Name="CommandLine">' CommandLine '</Data>' *
+| parse EventData with * '<Data Name="ParentImage">' ParentImage '</Data>' *
+| project TimeGenerated, ParentImage, Image, CommandLine
+| order by TimeGenerated asc;
+
+// -- Q7. Files written by powershell (find the staged payload) ----------------------
+Event
+| where TimeGenerated between (datetime(2024-04-17 02:49) .. datetime(2024-04-17 04:00))
+| where Computer == "FIN-WKS-04" and Source == "Microsoft-Windows-Sysmon" and EventID == 11
+| parse EventData with * '<Data Name="Image">' Image '</Data>' *
+| parse EventData with * '<Data Name="TargetFilename">' TargetFilename '</Data>' *
+| where Image endswith "powershell.exe"
+| project TimeGenerated, Image, TargetFilename
+| order by TimeGenerated asc;
+
+// -- Q8. Outbound connections from powershell (download + beacon) -------------------
+Event
+| where TimeGenerated between (datetime(2024-04-17 02:49) .. datetime(2024-04-17 04:00))
+| where Computer == "FIN-WKS-04" and Source == "Microsoft-Windows-Sysmon" and EventID == 3
+| parse EventData with * '<Data Name="Image">' Image '</Data>' *
+| parse EventData with * '<Data Name="DestinationIp">' DestinationIp '</Data>' *
+| parse EventData with * '<Data Name="DestinationPort">' DestinationPort '</Data>' *
+| where Image endswith "powershell.exe"
+| project TimeGenerated, DestinationIp, DestinationPort
+| order by TimeGenerated asc;
+
+// -- Q9. Prove the beacon regularity (avg/stdev of the connection interval) ---------
+Event
+| where TimeGenerated between (datetime(2024-04-17 02:53) .. datetime(2024-04-17 04:00))
+| where Computer == "FIN-WKS-04" and Source == "Microsoft-Windows-Sysmon" and EventID == 3
+| parse EventData with * '<Data Name="DestinationIp">' DestinationIp '</Data>' *
+| parse EventData with * '<Data Name="DestinationPort">' DestinationPort '</Data>' *
+| where DestinationIp == "185.220.101.47" and DestinationPort == "443"
+| order by TimeGenerated asc
+| serialize
+| extend GapSeconds = datetime_diff('second', TimeGenerated, prev(TimeGenerated))
+| summarize Connections = count(), AvgGap = avg(GapSeconds), StdevGap = stdev(GapSeconds);
+
+// -- Q10. DNS for the C2 domain -----------------------------------------------------
+Event
+| where Computer == "FIN-WKS-04" and Source == "Microsoft-Windows-Sysmon" and EventID == 22
+| parse EventData with * '<Data Name="QueryName">' QueryName '</Data>' *
+| parse EventData with * '<Data Name="QueryResults">' QueryResults '</Data>' *
+| where QueryName == "cdn-telemetry.net"
+| project TimeGenerated, QueryName, QueryResults;
+
+// -- Q11. Lateral movement: SSH auth on the Linux host ------------------------------
+Syslog
+| where TimeGenerated between (datetime(2024-04-17 02:49) .. datetime(2024-04-17 04:00))
+| where Facility in ("auth", "authpriv")
+| where SyslogMessage has "Failed password" or SyslogMessage has "Accepted password"
+| project TimeGenerated, HostName, SyslogMessage
+| order by TimeGenerated asc;
+
+// -- Q12. Telemetry sanity: are all hosts reporting during the window? --------------
+Heartbeat
+| where TimeGenerated between (datetime(2024-04-17 02:00) .. datetime(2024-04-17 04:00))
+| summarize LastSeen = max(TimeGenerated) by Computer;

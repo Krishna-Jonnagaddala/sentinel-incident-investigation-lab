@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Local exports / scratch — keep large raw log dumps out of the repo
+exports/
+*.csv
+*.zip
+*.evtx
+
+# Secrets / lab-specific config that shouldn't be published
+*.local
+secrets.*
+.env

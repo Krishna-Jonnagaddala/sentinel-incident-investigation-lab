@@ -1,0 +1,25 @@
+// Detection: Suspicious PowerShell (encoded command / download cradle)
+// Tactic/Technique: Execution + C2 / T1059.001, T1027, T1105
+// Schedule: run every 15m, lookback 1h
+// Flags PowerShell launched with the flag combinations attackers reach for:
+// encoded commands, hidden windows, and in-memory download cradles. Parent process
+// is included because powershell spawned by explorer.exe (a user double-clicking /
+// pasting) reads very differently from powershell spawned by a build agent.
+
+Event
+| where Source == "Microsoft-Windows-Sysmon" and EventID == 1
+| parse EventData with * '<Data Name="Image">' Image '</Data>' *
+| parse EventData with * '<Data Name="CommandLine">' CommandLine '</Data>' *
+| parse EventData with * '<Data Name="ParentImage">' ParentImage '</Data>' *
+| parse EventData with * '<Data Name="User">' User '</Data>' *
+| where Image endswith "powershell.exe" or Image endswith "pwsh.exe"
+| where CommandLine has_any (
+        "-enc", "-EncodedCommand",
+        "-nop", "-NoProfile",
+        "-w hidden", "-WindowStyle Hidden",
+        "DownloadString", "DownloadFile", "DownloadData",
+        "IEX", "Invoke-Expression",
+        "FromBase64String", "Net.WebClient", "Invoke-WebRequest")
+| extend Suspicion = array_length(extract_all(@"(-enc|-nop|-w hidden|DownloadString|IEX|Net\.WebClient|FromBase64String)", tolower(CommandLine)))
+| project TimeGenerated, Computer, User, ParentImage, Image, CommandLine, Suspicion
+| order by Suspicion desc, TimeGenerated asc

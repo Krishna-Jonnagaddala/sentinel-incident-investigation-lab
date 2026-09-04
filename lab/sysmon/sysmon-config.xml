@@ -1,0 +1,61 @@
+<!--
+  Sysmon config for the Sentinel Incident Investigation Lab.
+  Trimmed from the SwiftOnSecurity base (https://github.com/SwiftOnSecurity/sysmon-config)
+  down to the event types this lab's detections and investigation use:
+    1  ProcessCreate
+    3  NetworkConnect
+    11 FileCreate
+    22 DnsQuery
+  Everything else is excluded to keep lab ingest small. For a production config, start
+  from the full SwiftOnSecurity or Olaf Hartong modular config instead of this.
+
+  Install:  sysmon64.exe -accepteula -i sysmon-config.xml
+  Update :  sysmon64.exe -c sysmon-config.xml
+-->
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>SHA256</HashAlgorithms>
+  <EventFiltering>
+
+    <!-- Event 1: Process creation. Capture everything; the value here is command lines,
+         parent process, and hashes, which we filter on at query time in Sentinel. -->
+    <RuleGroup name="proc-create" groupRelation="or">
+      <ProcessCreate onmatch="exclude">
+        <!-- Drop the noisiest known-good signed telemetry to save volume. -->
+        <Image condition="is">C:\Windows\System32\CompatTelRunner.exe</Image>
+      </ProcessCreate>
+    </RuleGroup>
+
+    <!-- Event 3: Network connection. Exclude loopback; keep the rest so outbound
+         download and beacon connections are recorded. -->
+    <RuleGroup name="net-connect" groupRelation="or">
+      <NetworkConnect onmatch="exclude">
+        <DestinationIp condition="is">127.0.0.1</DestinationIp>
+        <DestinationIp condition="is">::1</DestinationIp>
+      </NetworkConnect>
+    </RuleGroup>
+
+    <!-- Event 11: File create. Scope to the directories staging typically lands in,
+         so we catch the dropped payload without recording every temp file write. -->
+    <RuleGroup name="file-create" groupRelation="or">
+      <FileCreate onmatch="include">
+        <TargetFilename condition="contains">\AppData\Local\Temp\</TargetFilename>
+        <TargetFilename condition="contains">\Downloads\</TargetFilename>
+        <TargetFilename condition="contains">\Public\</TargetFilename>
+        <TargetFilename condition="end">.ps1</TargetFilename>
+        <TargetFilename condition="end">.bat</TargetFilename>
+        <TargetFilename condition="end">.exe</TargetFilename>
+      </FileCreate>
+    </RuleGroup>
+
+    <!-- Event 22: DNS query. Exclude a handful of very common Microsoft/CDN domains to
+         cut noise; everything else (including the lab C2 domain) is recorded. -->
+    <RuleGroup name="dns-query" groupRelation="or">
+      <DnsQuery onmatch="exclude">
+        <QueryName condition="end">.microsoft.com</QueryName>
+        <QueryName condition="end">.windowsupdate.com</QueryName>
+        <QueryName condition="end">.msftncsi.com</QueryName>
+      </DnsQuery>
+    </RuleGroup>
+
+  </EventFiltering>
+</Sysmon>

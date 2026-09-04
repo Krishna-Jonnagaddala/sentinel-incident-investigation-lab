@@ -1,7 +1,7 @@
-# Indicators of Compromise — INC-2024-0417
+# Indicators of Compromise: INC-2024-0417
 
 Indicators extracted during the investigation, with how each was validated and how I'd use
-it. Lab values — the network indicators are placeholders chosen to represent
+it. Lab values, the network indicators are placeholders chosen to represent
 abuse-associated infrastructure; in a real case these would carry live reputation data.
 
 ## Network
@@ -29,8 +29,8 @@ abuse-associated infrastructure; in a real case these would carry live reputatio
 ## Validation philosophy
 
 I validated behavior-first. Every indicator here earns its place from what it did *in our
-own telemetry* — the unsolicited external RDP, the download cradle, the fixed-interval
-beacon — before any external reputation lookup. Threat-intel reputation is corroboration,
+own telemetry* the unsolicited external RDP, the download cradle, the fixed interval
+beacon before any external reputation lookup. Threat intel reputation is corroboration,
 not the basis of the verdict, so the case doesn't collapse if an enrichment source is down
 or wrong. For an indicator I couldn't tie to local behavior, I'd mark it "observed, not
 confirmed malicious" rather than promote it.

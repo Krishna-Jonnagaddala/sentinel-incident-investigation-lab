@@ -1,8 +1,8 @@
 # Sentinel Incident Investigation Lab
 
-A self-contained detection-and-response lab built on Microsoft Sentinel, plus a full
+A self contained detection-and-response lab built on Microsoft Sentinel, plus a full
 worked investigation of a simulated intrusion end to end: brute force against an
-internet-exposed RDP host, a successful logon with valid credentials, hands-on-keyboard
+internet exposed RDP host, a successful logon with valid credentials, hands-on-keyboard
 PowerShell, and outbound C2. The repo contains everything I used to build the lab, the
 analytics rules that fired, the KQL I ran during triage, and the incident report I wrote
 at the end.

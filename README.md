@@ -138,7 +138,7 @@ sentinel-incident-investigation-lab/
 
 ## References
 
-- MITRE ATT&CK Enterprise — https://attack.mitre.org
-- Sysmon (Sysinternals) — https://learn.microsoft.com/sysinternals/downloads/sysmon
+- MITRE ATT&CK Enterprise - https://attack.mitre.org
+- Sysmon (Sysinternals) - https://learn.microsoft.com/sysinternals/downloads/sysmon
 - Windows security audit event reference (4624/4625/4672/4688)
 - SwiftOnSecurity `sysmon-config` (starting point for the endpoint config)

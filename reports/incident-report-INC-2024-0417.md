@@ -57,7 +57,7 @@ Raised by the scheduled analytics rule *Brute Force Followed by Successful Inter
 Logon*, which correlates a failed-RDP storm with a subsequent successful logon from the
 same source IP against the same host. A standalone brute-force rule and a suspicious
 PowerShell rule also fired and grouped onto the same host entity, corroborating the
-incident. The correlation rule — not the raw brute-force count is what escalated this to
+incident. The correlation rule not the raw brute-force count is what escalated this to
 a page.
 
 ## Investigation summary

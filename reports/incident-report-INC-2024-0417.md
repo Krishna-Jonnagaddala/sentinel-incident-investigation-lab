@@ -5,7 +5,7 @@
 | **Incident ID** | INC-2024-0417 (Sentinel incident 2417) |
 | **Title** | Interactive compromise of FIN-WKS-04 via RDP brute force |
 | **Severity** | High |
-| **Classification** | True positive — confirmed intrusion |
+| **Classification** | True positive - confirmed intrusion |
 | **Detected** | 2024-04-17 02:49 UTC |
 | **Contained** | 2024-04-17 03:20 UTC |
 | **Report author** | K. Jonnagaddala (SOC) |

@@ -16,11 +16,11 @@ work. Where a portal step is obvious I've left it out.
 
 Three VMs, all with the Azure Monitor Agent installed and associated to the DCRs below.
 
-- `DC01` — Windows Server, AD DS, one domain `CORP`.
-- `FIN-WKS-04` — Windows 11, domain-joined, a standard user `CORP\a.patel` who is a local
+- `DC01` - Windows Server, AD DS, one domain `CORP`.
+- `FIN-WKS-04` - Windows 11, domain-joined, a standard user `CORP\a.patel` who is a local
   admin on their own workstation (common in the wild, and the reason the post-access
   PowerShell runs without a UAC fight).
-- `WEB-SRV-02` — Ubuntu 22.04, OpenSSH server, nginx. Password auth left enabled for the
+- `WEB-SRV-02` - Ubuntu 22.04, OpenSSH server, nginx. Password auth left enabled for the
   pivot test.
 
 Create the service account `CORP\svc_backup` so the brute force has a realistic
@@ -67,18 +67,18 @@ Event
 
 ## 5. Data Collection Rules
 
-**`dcr-win-security`** — Windows Event Logs data source, Security channel, with an XPath
+**`dcr-win-security`** - Windows Event Logs data source, Security channel, with an XPath
 filter so only the event IDs used here are ingested:
 
 ```
 Security!*[System[(EventID=4624 or EventID=4625 or EventID=4672 or EventID=4688)]]
 ```
 
-**`dcr-win-sysmon`** — Windows Event Logs data source, custom channel
+**`dcr-win-sysmon`** - Windows Event Logs data source, custom channel
 `Microsoft-Windows-Sysmon/Operational`, no XPath filter (the Sysmon config already scopes
 it). Lands in `Event`.
 
-**`dcr-linux-syslog`** — Linux Syslog data source, facilities `auth` and `authpriv` at
+**`dcr-linux-syslog`** - Linux Syslog data source, facilities `auth` and `authpriv` at
 `LOG_INFO` and above. Lands in `Syslog`.
 
 Associate all three to the appropriate VMs. Give it ~15 minutes and verify each table has
@@ -90,18 +90,18 @@ Import the four rules from [`../detections/`](../detections). Each `.kql` file i
 query; the rule metadata (schedule, threshold, entity mapping) is documented in
 [`../detections/README.md`](../detections/README.md). The one that raises the incident for
 this case is `02-bruteforce-then-success.kql`, run on a 5-minute schedule over a
-1-hour lookback.
+1 hr lookback.
 
 ## 7. Run the simulation
 
 From an isolated lab jump box (or the firewall's allowed test source), run the scripts in
 [`../lab/attack-simulation/`](../lab/attack-simulation) in order. Read that folder's README
-first — the scripts are safe stand-ins, but you should understand what they touch before
+first, the scripts are safe stand-ins, but you should understand what they touch before
 running them. After the second script, an incident should appear in Sentinel within one
 rule interval.
 
 ## Teardown
 
-Deallocate the VMs when you're done, and remove the internet-facing RDP rule immediately
+Deallocate the VMs when you're done, and remove the internet facing RDP rule immediately
 after the test regardless of whether you tear down the rest. Leaving 3389 open to the
 internet is the whole point of the scenario and not something to forget running.

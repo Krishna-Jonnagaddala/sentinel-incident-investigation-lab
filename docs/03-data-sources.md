@@ -1,7 +1,7 @@
 # Data Sources
 
 The tables and fields the investigation relies on, and how to read the ones that aren't
-self-explanatory. Written so someone picking up the case can follow the KQL without
+self explanatory. Written so someone picking up the case can follow the KQL without
 guessing what a column means.
 
 ## SecurityEvent
@@ -17,10 +17,10 @@ Windows Security log. The case uses four event IDs.
 
 **LogonType** is the field that carries most of the meaning here:
 
-- `2` — interactive (at the console)
-- `3` — network (SMB, etc.)
-- `10` — RemoteInteractive (**RDP**) ← the one in this case
-- `5` — service
+- `2` - interactive (at the console)
+- `3` - network (SMB, etc.)
+- `10` - RemoteInteractive (**RDP**) ← the one in this case
+- `5` - service
 
 A brute force over RDP shows up as repeated `4625` with `LogonType == 10`. If you see the
 same pattern with `LogonType == 3`, you're looking at network logons (often SMB or
@@ -71,7 +71,7 @@ Linux `auth`/`authpriv`. Used for the SSH pivot.
 
 SSH failures look like:
 `Failed password for a.patel from 10.10.20.45 port 51824 ssh2`. The important part for
-the case is the source IP `10.10.20.45` — that's `FIN-WKS-04`, so the pivot is coming
+the case is the source IP `10.10.20.45` - that's `FIN-WKS-04`, so the pivot is coming
 *from* the compromised workstation.
 
 ## Heartbeat

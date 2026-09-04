@@ -29,9 +29,9 @@ and the detections are plain `.kql` files you can paste into Log Analytics.
 |---|---|
 | SIEM | Microsoft Sentinel on Log Analytics workspace `law-soc-lab` |
 | Domain | `CORP` (single-domain, DC on `DC01`) |
-| Windows endpoint | `FIN-WKS-04` — Windows 11, finance workstation, `10.10.20.45`, RDP exposed via NAT for the test |
-| Linux endpoint | `WEB-SRV-02` — Ubuntu 22.04, nginx + OpenSSH, `10.10.20.60` |
-| Domain controller | `DC01` — `10.10.20.10` |
+| Windows endpoint | `FIN-WKS-04` - Windows 11, finance workstation, `10.10.20.45`, RDP exposed via NAT for the test |
+| Linux endpoint | `WEB-SRV-02` - Ubuntu 22.04, nginx + OpenSSH, `10.10.20.60` |
+| Domain controller | `DC01` - `10.10.20.10` |
 | Windows telemetry | Windows Security auditing (4624/4625/4672/4688) + Sysmon (SwiftOnSecurity base config, tuned) forwarded via AMA |
 | Linux telemetry | Syslog (`auth`/`authpriv`) via AMA |
 

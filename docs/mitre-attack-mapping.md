@@ -1,4 +1,4 @@
-# MITRE ATT&CK Mapping — INC-2024-0417
+# MITRE ATT&CK Mapping: INC-2024-0417
 
 Techniques observed in this incident, each tied to the specific evidence that supports it.
 I only map techniques I can point at evidence for; anything inferred but not observed is

@@ -1,7 +1,7 @@
 # Attack Simulation
 
 These scripts generate the telemetry the investigation is built on. They reproduce the
-*technique* — and therefore the log events — of the intrusion, without doing anything
+*technique* - and therefore the log events - of the intrusion, without doing anything
 actually malicious. Read this before you run any of them.
 
 ## What's real and what's a stand-in
@@ -13,7 +13,7 @@ actually malicious. Read this before you run any of them.
 | SSH pivot | SSH lateral movement | Real SSH connection attempts from the workstation to the Linux host with a wrong password; generates genuine `Failed password` Syslog entries. |
 
 The point is that the detections and the investigation should not be able to tell the
-difference at the log level — the events are indistinguishable from the real thing, which
+difference at the log level the events are indistinguishable from the real thing, which
 is exactly what makes them useful for practicing detection and triage. The payload and C2
 are declawed so nothing dangerous runs.
 
@@ -29,11 +29,11 @@ are declawed so nothing dangerous runs.
 
 ## Run order
 
-1. `01-rdp-bruteforce.ps1` — from the "attacker" source, against `FIN-WKS-04`. Produces the
+1. `01-rdp-bruteforce.ps1` - from the "attacker" source, against `FIN-WKS-04`. Produces the
    `4625` storm and one `4624` success.
-2. `02-post-access.ps1` — on `FIN-WKS-04`, in the session opened by step 1. Produces the
+2. `02-post-access.ps1` - on `FIN-WKS-04`, in the session opened by step 1. Produces the
    PowerShell execution, download, file write, DNS, and beacon events.
-3. `03-ssh-pivot.sh` — from `FIN-WKS-04` toward `WEB-SRV-02`. Produces the failed SSH
+3. `03-ssh-pivot.sh` - from `FIN-WKS-04` toward `WEB-SRV-02`. Produces the failed SSH
    Syslog entries.
 
 Give Sentinel one rule interval after step 1–2 and the *Brute Force Followed by Successful

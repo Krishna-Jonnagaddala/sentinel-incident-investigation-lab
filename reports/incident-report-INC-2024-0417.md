@@ -1,4 +1,4 @@
-# Incident Report — INC-2024-0417
+# Incident Report: INC-2024-0417
 
 | | |
 |---|---|
@@ -22,7 +22,7 @@ over SSH; that attempt failed. The workstation was isolated and the account disa
 approximately 31 minutes after detection.
 
 Root cause was an internet-reachable RDP service protected only by a password. No exploit
-or malware vulnerability was involved — this was valid-credential access enabled by an
+or malware vulnerability was involved this was valid-credential access enabled by an
 exposure and weak authentication.
 
 ## Impact
@@ -55,9 +55,9 @@ exposure and weak authentication.
 
 Raised by the scheduled analytics rule *Brute Force Followed by Successful Interactive
 Logon*, which correlates a failed-RDP storm with a subsequent successful logon from the
-same source IP against the same host. A standalone brute-force rule and a suspicious-
+same source IP against the same host. A standalone brute-force rule and a suspicious
 PowerShell rule also fired and grouped onto the same host entity, corroborating the
-incident. The correlation rule — not the raw brute-force count — is what escalated this to
+incident. The correlation rule — not the raw brute-force count is what escalated this to
 a page.
 
 ## Investigation summary
@@ -71,7 +71,7 @@ Full working notes, including every query, are in
 2. **Endpoint.** Post-logon, `explorer.exe` spawned hidden encoded PowerShell decoding to a
    `DownloadString` cradle; a second stage was written to the user's Temp directory.
 3. **Network.** PowerShell downloaded from `185.220.101.47:80`, then beaconed to the same
-   host on 443 at a low-variance ~60s interval — a command-and-control signature.
+   host on 443 at a low variance ~60s interval a command-and-control signature.
 4. **Lateral movement.** Failed SSH password attempts on `WEB-SRV-02` originated from the
    compromised workstation; the pivot did not succeed.
 
@@ -109,7 +109,7 @@ See [`../investigation/iocs.md`](../investigation/iocs.md). Key: `45.155.205.233
   standalone beacon rule (interval regularity) independently detects the C2 and should be
   kept as defense-in-depth against a slower brute force that stays under the correlation
   threshold.
-- The single biggest risk reduction here is not a detection at all — it's removing the RDP
+- The single biggest risk reduction here is not a detection at all it's removing the RDP
   exposure and requiring MFA. Detection caught the intrusion in minutes; prevention would
   have stopped it entirely.
 

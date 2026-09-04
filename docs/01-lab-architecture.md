@@ -2,7 +2,7 @@
 
 ## Goal
 
-Reproduce the telemetry a small enterprise would generate around an RDP-based intrusion,
+Reproduce the telemetry a small enterprise would generate around an RDP based intrusion,
 and pipe it into Microsoft Sentinel so I can build detections against it and practice the
 full investigation. Two endpoints is enough to cover identity, endpoint, and network
 signal, plus one lateral-movement hop.
@@ -65,20 +65,20 @@ because the config file already scopes what gets recorded on the endpoint.
 
 ## What each host contributes
 
-- **DC01** — Kerberos/NTLM authentication context and account state. In this case the
+- **DC01** - Kerberos/NTLM authentication context and account state. In this case the
   brute force is a local RDP logon rather than domain auth, so DC01 is mostly used to
   confirm the account is a normal domain user and to check for follow-on domain activity.
-- **FIN-WKS-04** — the compromised host. Primary source of evidence: logon events,
+- **FIN-WKS-04** - the compromised host. Primary source of evidence: logon events,
   process creation (Sysmon + 4688), file writes, DNS, and network connections.
-- **WEB-SRV-02** — the lateral-movement target. Contributes SSH auth failures that let me
+- **WEB-SRV-02** - the lateral-movement target. Contributes SSH auth failures that let me
   confirm the pivot attempt and that it did not succeed.
 
 ## Threat model for the scenario
 
-A single external actor with no prior foothold, targeting an internet-reachable RDP
+A single external actor with no prior foothold, targeting an internet reachable RDP
 service. Objective: interactive access, then tooling download and C2. The scenario
-intentionally uses valid-credential access (not an exploit) because that's the common,
-noisy-then-quiet pattern SOCs actually see, and it forces the investigation to reason
+intentionally uses valid credential access (not an exploit) because that's the common,
+noisy then quiet pattern SOCs actually see, and it forces the investigation to reason
 about "is this the real user or not?" rather than relying on a malware signature.
 
 Out of scope for this lab: persistence mechanisms beyond the initial session, privilege

@@ -9,4 +9,4 @@ show the shape of what the detections parse.
 - `4624-successful-rdp-logon.json` - the successful logon that landed.
 - `sysmon-1-powershell.xml` - the encoded PowerShell process-create event.
 - `sysmon-3-beacon.xml` - one of the C2 beacon network-connect events.
-- `syslog-ssh-failed.log` — the failed SSH pivot attempts on WEB-SRV-02.
+- `syslog-ssh-failed.log` - the failed SSH pivot attempts on WEB-SRV-02.

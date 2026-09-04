@@ -2,7 +2,7 @@
 
 A few representative raw records from the incident window, so the queries in this repo have
 something concrete to map to. These are trimmed to the fields that matter and are lab data
-(the "malicious" traffic is from the simulation scripts). Not a full export — just enough to
+(the "malicious" traffic is from the simulation scripts). Not a full export, just enough to
 show the shape of what the detections parse.
 
 - `4625-failed-rdp-logon.json` — one of the 214 failed RDP logons.
